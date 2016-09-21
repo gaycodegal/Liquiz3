@@ -1,8 +1,100 @@
+<!DOCTYPE html>
 <html>
-  <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-  </head>
-  <body>
-    <center>running!</center>
-  </body>
+<head>
+  <meta charset='utf-8'/>
+  <title>LiquiZ Home</title>
+  <link rel="stylesheet" type="text/css" href="assets/css/normalize.css">
+  <link rel="stylesheet" href="assets/css/demostyle.css"/>
+  <link rel="stylesheet" href="assets/css/equation.css"/>
+  <link rel="stylesheet" href="assets/css/printing.css"/>
+  <link rel='stylesheet' href='assets/css/spectrum.css' />
+  <script src="assets/js/Assertions.js"></script>
+  <script src="assets/js/d3.v3.min.js"></script>
+  <script src="assets/js/d3.tip.v0.6.3.js"></script>
+
+
+<script type="text/javascript" src="assets/js/MathJax-2.6-latest/MathJax.js?config=AM_CHTML"></script> 
+  <script src="assets/js/equationListener.js"></script>
+  <script src="assets/js/jspdf.min.js"></script>
+  <script src="assets/js/jquery.1.11.3.min.js"></script>
+  <script src='assets/js/editors/outsourced/spectrum.js'></script>
+  <script type="text/javascript" src="assets/js/editors/chararray.js"></script>
+  <script type="text/javascript" src="assets/js/editors/archetypes.js"></script>
+  <script type="text/javascript" src="assets/js/editors/conditionalfield.js"></script>
+  <script type="text/javascript" src="assets/js/editors/fields.js"></script>
+  <script src="assets/js/DropDownMenu.js"></script>
+  <script src="assets/js/lib.js"></script>
+  <script src="assets/js/ScopedDictionary.js"></script>
+  <script src="assets/js/Index.js"></script>
+  <script src="assets/js/Tests.js"></script>
+  <script src="assets/js/QuizEdit.js"></script>
+  <script src="assets/js/Policy.js"></script>
+  <script src="assets/js/Quiz.js"></script>
+  <script src="assets/js/QuizList.js"></script>
+  <script src="assets/js/Calendar.js"></script>
+  <script src="assets/js/Grades.js"></script>
+  <script src="assets/js/Graph.js"></script>
+  <script src="assets/js/Equation.js"></script>
+  <script src="assets/js/DivWindow.js"></script>
+  <script src="assets/js/EditingPlugins.js"></script>
+  <script src="assets/js/sel_opt_groups.js"></script>
+  <script src="assets/js/Survey.js"></script>
+  <script src="assets/js/printanyhtml.js"></script>
+  <script src="assets/js/printanybezier.js"></script>
+  <script src="assets/js/Filesaver.js"></script>
+  <script src="assets/js/About.js"></script>
+  <script src="assets/js/VarWriter.js"></script>
+  <script src="assets/js/ClickableImage.js"></script>
+  <script src="assets/js/Paint.js"></script>
+  
+</head>
+<body>
+
+  <div id="menu">
+	<ul>
+	<li><a class="mi" href="#/demos/QuizDemo">Static Demo</a></li>
+	<li><a class="mi" href="#/demos/displayQuiz">JavaObject Demo</a></li>
+	<li><a class="mi" href="#/demos/test">Test</a></li>
+	
+    <!-- <li><span class="mi midropcontrol">JavaObject Demo
+		<div class="midropdown">
+			<a class="mi" href="#/demos/quiz1">Quiz1</a><br>
+			<a class="mi" href="#/demos/quiz2">Quiz2</a><br>
+			<a class="mi" href="#/demos/quiz3">Quiz3</a>
+		</div>
+		</span></li> -->
+    <li><a class="mi" href="#/about">About</a></li>
+    <li><span class="mi midropcontrol">More
+		<div class="midropdown">
+			<a class="mi" href="#/courses">Courses</a><br>
+			<a class="mi" href="#/demos/QuizList">Quizzes</a><br>
+			<a class="mi" href="#/demos/grades">Grades</a><br>
+			<a class="mi" href="#/demos/holidays">Holidays</a><br>
+			<a class="mi" href="#/schedule">Schedule</a><br>
+			<a class="mi" href="#/demos/ArithQuizDemo">Arithmetic</a><br>
+			<a class="mi" href="#/demos/csdemo">CS Demo</a><br>
+			<a class="mi" href="#/demos/equation">Equation</a><br>
+			<a class="mi" href="#/demos/Survey">Survey</a><br>
+			<a class="mi" href="#/demos/tests">Tests</a><br>
+			<a class="mi" onclick="localStorage.dir = {}">Local</a>
+		</div></span></li>
+	</ul>
+	<div class="loginform">
+		<div class="loginformabs">
+		  <form method="POST" action="AJAXLogin.jsp">
+			<input name="userid" placeholder="ID"/>
+			<input type="password" name="passwd"/>
+			<input id="login" type="button" onclick="requestResponse('AJAXLogin.jsp', this.form.userid, getAjax)" value="Login"/>
+		  </form>
+		</div>
+    </div>
+	<a href="#/"><img class="logo" src="assets/img/title_logo.png"/></a>
+    
+    	
+  </div>
+  <div id="currentStatus">
+    <noscript>Please enable JavaScript!</noscript>
+  </div>
+  <div id="container"></div>
+</body>
 </html>
