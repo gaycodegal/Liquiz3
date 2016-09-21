@@ -1,0 +1,19 @@
+{
+"manifest_version": 2,
+"name": "Liquiz",
+"description": "Innovative Assesment in a Box.",
+"version": "0.3.0",
+"icons": {
+"128": "128.png"
+},
+"permissions": [
+"storage",
+"fullscreen",
+{"fileSystem": ["write", "retainEntries", "directory"]}
+],
+"app": {
+    "background": {
+      "scripts": ["main.js"]
+    }
+  }
+}
