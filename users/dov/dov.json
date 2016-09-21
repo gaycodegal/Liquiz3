@@ -1,0 +1,25 @@
+{
+    "css" : "red.css",
+    "stdchoice": {
+	"tf" : ["true", "false"],
+	"Likert3" : ["Agree", "Neutral", "Disagree"],
+	"Likert3NA" : ["Agree", "Neutral", "Disagree", "N/A"],
+    },
+    "regex": {
+	"c++": {
+	    "float" : "regex",
+	    "double" : "regex",
+	    "ident", : "[A_Za-z_][A_Za-z_0-9]*",
+	    
+	    
+	}
+    },
+    "policies": {
+	
+	
+    },
+    "vars" : {
+	"r1": ["randint", 1, 10],
+	"r2": ["randint", 0, 10]
+    }
+}
