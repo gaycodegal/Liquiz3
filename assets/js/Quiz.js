@@ -1004,6 +1004,7 @@ Quiz.prototype.multiAnswer = function (id, txt) {
 /*
  * Edit and store the policies governing a quiz, ie how it may be taken, when to display answers, etc.
  */
+
 /*
 function Policy() {
   this.body = document.getElementById("container");
@@ -1045,3 +1046,4 @@ Policy.prototype.edit = function () {
   );
   this.scrollToEditor();
 }
+*/
