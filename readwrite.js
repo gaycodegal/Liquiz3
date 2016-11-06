@@ -28,7 +28,6 @@ function FileService() {
 }
 
 FileService.prototype.onWindowLoad = function () {
-    console.log("asdf");
     var o = this.localStorageGet("Liquiz-FileSystem-ID", this.onFileSystemIDLoad);
 };
 
@@ -46,6 +45,9 @@ FileService.prototype.onFileSystemInit = function (entry) {
 };
 
 FileService.prototype.getFileFS = function (name, docreate, onsuccess, onfail, filesys) {
+    if (!onfail)
+        onfail = FileService.fallback;
+
     var self = this;
     console.log(name);
     var dofail = function (e) {
@@ -54,7 +56,7 @@ FileService.prototype.getFileFS = function (name, docreate, onsuccess, onfail, f
             onfail("", false);
     };
 
-    if (typeof name == "string")
+    if (typeof name == "string") // /docs//blog/a.txt
         name = name.split("/");
     while (!name[0].length)
         name = name.slice(1);
@@ -94,33 +96,61 @@ FileService.prototype.getFileFS = function (name, docreate, onsuccess, onfail, f
 
 };
 
-FileService.prototype.writeFileFS = function (name, contents, type, onsuccess, onfail) {
+FileService.fallback = function () {
+    console.error("File not fountd!");
+};
+
+FileService.prototype.writeFileFS = function (name, contents, type, onsuccess, onfail, filesys) {
+    if (!onfail)
+        onfail = FileService.fallback;
+
+    var self = this;
+    console.log(name);
     var dofail = function (e) {
+        console.log("fail", e);
         if (onfail)
-            onfail(e);
+            onfail("", false);
     };
-    var dosuccess = function (e) {
-        if (onsuccess)
-            onsuccess(chosenFileEntry);
+
+    if (typeof name == "string")
+        name = name.split("/");
+    while (!name[0].length)
+        name = name.slice(1);
+    filesys || (filesys = this.fileSystem);
+    if (!filesys)
+        return this.queuedTasks.push(["writeFileFS", arguments]);
+
+    console.log("WRITING", filesys, name, contents);
+
+    var dosucceed = function (e) {
+        console.log(e);
+        if (name.length == 1) {
+            chrome.fileSystem.getWritableEntry(e, function (writableFileEntry) {
+                writableFileEntry.createWriter(function (writer) {
+                    writer.onerror = dofail;
+                    writer.onwriteend = onsuccess;
+                    writableFileEntry.file(function (file) {
+                        writer.write(new Blob([contents], {
+                            type: type || 'text/plain'
+                        }));
+                    });
+                }, dofail);
+            });
+        } else {
+            filesys = e;
+            self.writeFileFS(name.slice(1), contents, type, onsuccess, onfail, filesys);
+        }
+
     };
-    this.fileSystem.getFile(name, {
-        create: true
-    }, function (chosenFileEntry) {
-        //console.log("success write",chosenFileEntry);
-        chrome.fileSystem.getWritableEntry(chosenFileEntry, function (writableFileEntry) {
-            writableFileEntry.createWriter(function (writer) {
-                writer.onerror = dofail;
-                writer.onwriteend = dosuccess;
-                chosenFileEntry.file(function (file) {
-                    writer.write(new Blob([contents], {
-                        type: type || 'text/plain'
-                    }));
-                });
-            }, dofail);
-        });
-
-    }, dofail);
-
+    if (name.length == 1) {
+        filesys.getFile(name[0], {
+            create: true
+        }, dosucceed, dofail);
+    } else {
+        filesys.getDirectory(name[0], {
+            create: true
+        }, dosucceed, dofail);
+    }
 };
 
 
@@ -131,9 +161,6 @@ FileService.prototype.onFileSystemRestore = function (entry) {
         this[task[0]].apply(this, task[1]);
     }
     this.queuedTasks = [];
-    //console.log();
-    //this.getFileFS("asdf/asdf/supernova.txt", true);
-    //this.writeFileFS("/hai/you/supernova.txt", "bingo pig part\n");
 };
 
 FileService.prototype.onFileSystemIDLoad = function (o) {
@@ -176,35 +203,24 @@ FileService.prototype.localStorageGet = function (id, callback) {
     }
 };
 
-FileService.prototype.fetch = function (user, project, request, callback) {
+/**
+Fetch the contents of a file from the server.
+@param {string} request The path of the request excluding domain name.
+@example "dov/user/file.jsp"
+@param {Function(requestText, wasSuccessful)} callback
+@param {string} server The domain name and protocol of the server or false to go local.
+Note: requires ending slash.
+@example "http://www.liquiz.com/" or false
+@param {Function(requestText, wasSuccessful)} onfail
+*/
+FileService.prototype.fetch = function (request, callback, server, onfail) {
     var xmlhttp = new XMLHttpRequest();
-    var url = "";
-    if (this.mode & FileService.MODE_SERVER) {
-        url += "http://";
-    }
-    if ((this.mode & FileService.MODE_SERVER)) {
-        if (this.mode & FileService.MODE_LOCAL) {
-            url += "localhost";
-            if (this.localPort != 80)
-                url += ":" + this.localPort;
-            url += "/";
-        } else {
-            url += request.domainURL + "/";
-        }
-    }
-    if (this.mode & FileService.MODE_INTERNAL) {
-        url += "users/" + user.pathName + "/";
-        if (project.pathName) {
-            if (!project.isTopLevel)
-                url += "projects/";
-            url += project.pathName + "/";
-        }
-        if (request.pathName)
-            url += request.pathName + "/";
-    }
-    url += request.resource;
-    console.log(url);
     var self = this;
+
+    if (!server)
+        return this.getFileFS(request, false, callback, onfail);
+
+    var url = server + request;
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             callback(xmlhttp.responseText)
@@ -214,26 +230,70 @@ FileService.prototype.fetch = function (user, project, request, callback) {
     xmlhttp.send();
 };
 
+/**
+Write the contents of a file to the server, get back a response.
+@param {string} request The path of the request excluding domain name.
+@example "dov/user/file.jsp"
+@param {string} filecontents The contents of the file to send.
+@param {string} fileblobtype The type of the data being sent
+@example "text/plain"
+@param {Function(requestText, wasSuccessful)} callback
+@param {string} server The domain name and protocol of the server or false to go local.
+Note: requires ending slash.
+@example "http://www.liquiz.com/" or false
+@param {Function(requestText, wasSuccessful)} onfail
+*/
+FileService.prototype.write = function (filename, filecontents, fileblobtype, callback, server, onfail) {
+    if (!filename) return;
+    if (!fileblobtype) fileblobtype = "text/plain";
+
+    var xmlhttp = new XMLHttpRequest();
+    var self = this;
+
+    if (!server)
+        return this.writeFileFS(filename, filecontents, fileblobtype, callback, onfail);
+
+    var url = server + filename;
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            callback(xmlhttp.responseText)
+        }
+    };
+
+    var formData = new FormData();
+    formData.append("filename", filename);
+    if (filecontents)
+        formData.append("filecontents", filecontents);
+    else
+        formData.append("deletethisfile", filecontents);
+    formData.append("fileblobtype", fileblobtype);
+    xmlhttp.open("POST", url, true);
+    xmlhttp.send(formData);
+};
+
 window.addEventListener("load", FileService.windowOnLoad);
 
 var service = new FileService();
 
-
-function TempLoad() {
+function TestLoad() {
     //test
-    var service = new FileService();
+    
 
+    service.fetch("test/index.html", function (filecontents) {
+        console.log("YAY", filecontents);
+    }, "http://bluecode.altervista.org/"); // global
 
-    service.fetch({
-        pathName: "dov"
-    }, {
-        pathName: "user_data",
-        isTopLevel: true
-    }, {
-        resource: "dov.json"
-    }, function (text) {
-        console.log(text);
-    });
+    service.fetch("test/index.html", function (filecontents) {
+        console.log("YAY", filecontents);
+    }); // local
 
-    service.instantiateChrome();
+    service.write("test/index2.html", "testing testing\n", "text/plain", function () {
+        console.log("YAY");
+    }, "http://bluecode.altervista.org/"); // global
+
+    service.write("test/index2.html", "testing testing\n", "text/html", function () {
+        console.log("YAY");
+    }); // local
 }
+
+TestLoad();

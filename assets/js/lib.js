@@ -580,10 +580,18 @@ function FileBrowser() {
 
 FileBrowser.prototype.init = function () {
     console.info("over write this for chrome extensions");
-    /*if (!window.localStorage.files)
-        window.localStorage.files = "{}";
+    var self = this;
+    var trueInit = function () {
+        service.localStorageGet("files", function (o) {
+            if (o.files)
+                self.storage = JSON.parse(o.files);
+            else
+                self.storage = {};
+        });
+    };
+    window.addEventListener("load", trueInit);
 
-    this.storage = JSON.parse(window.localStorage.files);*/
+
 };
 
 FileBrowser.prototype.render = function (data) {
@@ -659,7 +667,22 @@ FileBrowser.prototype.getFile = function (name) {
 
 
 FileBrowser.prototype.addFile = function (name, content, saveToSource) {
-    console.info("over write this for chrome extensions");
+    console.info("overwrite this for chrome extensions");
+
+    service.localStorageGet("files", function (o) {
+        if (o.files)
+            this.storage = JSON.parse(o.files);
+        else
+            this.storage = {};
+    });
+    if (saveToSource == 1) {
+        this.storage[name] = JSON.stringify(content);
+        service.localStorageSet(JSON.stringify(this.storage), "files");
+    } else if (saveToSource == 2) {
+        service.write("files/" + name + ".json", JSON.stringify(content), "text/plain;charset=utf-8");
+    }
+
+
     /*if (saveToSource == 1) {
         this.storage[name] = JSON.stringify(content);
         window.localStorage.files = JSON.stringify(this.storage);
