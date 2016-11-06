@@ -579,7 +579,7 @@ function FileBrowser() {
 }
 
 FileBrowser.prototype.init = function () {
-    console.info("over write this for chrome extensions");
+    console.info("overwrite this for chrome extensions");
     var self = this;
     var trueInit = function () {
         service.localStorageGet("files", function (o) {
@@ -669,16 +669,12 @@ FileBrowser.prototype.getFile = function (name) {
 FileBrowser.prototype.addFile = function (name, content, saveToSource) {
     console.info("overwrite this for chrome extensions");
 
-    service.localStorageGet("files", function (o) {
-        if (o.files)
-            this.storage = JSON.parse(o.files);
-        else
-            this.storage = {};
-    });
+    
     if (saveToSource == 1) {
         this.storage[name] = JSON.stringify(content);
         service.localStorageSet(JSON.stringify(this.storage), "files");
     } else if (saveToSource == 2) {
+        console.log("files/" + name + ".json");
         service.write("files/" + name + ".json", JSON.stringify(content), "text/plain;charset=utf-8");
     }
 

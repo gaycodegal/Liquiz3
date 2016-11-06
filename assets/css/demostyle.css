@@ -274,6 +274,8 @@ td {
     font-size: 16pt;
     font-weight: bold;*/
     background-color: #A7C1E8;
+    overflow: auto;
+    display: block;
     /*color: white;*/
 }
 
@@ -350,6 +352,8 @@ h1 {
     border-color: #A7C1E8;
     padding: 20px;
 }
+
+
 
 .midropdown .mi {
     line-height: 30px;
@@ -491,7 +495,9 @@ body, html {
 
 .edit-quiz {
     /*width: 200px;*/
-    height: 32px;
+    min-height: 32px;
+    overflow: auto;
+    display: block;
     float: right;
     font-size: 16px;
 }
