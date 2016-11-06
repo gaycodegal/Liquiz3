@@ -484,7 +484,7 @@ img.logo {
   -moz-osx-font-smoothing: grayscale;
 }*/
 
-body, html {
+html {
     overflow: scroll;
 }
 
